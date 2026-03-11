@@ -74,6 +74,244 @@ export class HealthService {
 }
 `
 
+// ─── Health Tests (Vitest) ───
+
+var TmplHealthServiceVitestSpec = `import { describe, it, expect, beforeEach, vi } from "vitest";
+import { Test, type TestingModule } from "@nestjs/testing";
+import { HealthService } from "./health.service";
+import { mockPinoLoggerProvider } from "../../../../test/mock/pino-mock";
+
+describe("HealthService", () => {
+  let service: HealthService;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [HealthService, mockPinoLoggerProvider],
+    }).compile();
+
+    service = module.get<HealthService>(HealthService);
+  });
+
+  describe("check()", () => {
+    it("should return status ok", () => {
+      const result = service.check();
+      expect(result.status).toBe("ok");
+    });
+
+    it("should include uptime as a number", () => {
+      const result = service.check();
+      expect(typeof result.uptime).toBe("number");
+      expect(result.uptime).toBeGreaterThanOrEqual(0);
+    });
+
+    it("should include a valid ISO timestamp", () => {
+      const result = service.check();
+      expect(result.timestamp).toBeDefined();
+      expect(() => new Date(result.timestamp)).not.toThrow();
+      expect(new Date(result.timestamp).toISOString()).toBe(result.timestamp);
+    });
+
+    it("should include memory usage", () => {
+      const result = service.check();
+      expect(result.memory).toBeDefined();
+      expect(typeof result.memory.heapUsed).toBe("number");
+    });
+  });
+
+  describe("live()", () => {
+    it("should return status ok", () => {
+      expect(service.live()).toEqual({ status: "ok" });
+    });
+  });
+
+  describe("ready()", () => {
+    it("should return status ok with timestamp", () => {
+      const result = service.ready();
+      expect(result.status).toBe("ok");
+      expect(result.timestamp).toBeDefined();
+    });
+  });
+});
+`
+
+var TmplHealthControllerVitestSpec = `import { describe, it, expect, beforeEach, vi } from "vitest";
+import { Test, type TestingModule } from "@nestjs/testing";
+import { HealthController } from "./health.controller";
+import { HealthService } from "./health.service";
+import { mockPinoLoggerProvider } from "../../../../test/mock/pino-mock";
+
+const mockHealthResult = {
+  status: "ok",
+  uptime: 100,
+  timestamp: new Date().toISOString(),
+  memory: { heapUsed: 1024, heapTotal: 2048, rss: 4096, external: 0, arrayBuffers: 0 },
+  version: "0.1.0",
+};
+
+describe("HealthController", () => {
+  let controller: HealthController;
+  let service: HealthService;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [HealthController],
+      providers: [HealthService, mockPinoLoggerProvider],
+    }).compile();
+
+    controller = module.get<HealthController>(HealthController);
+    service = module.get<HealthService>(HealthService);
+  });
+
+  describe("check()", () => {
+    it("should return health check result", () => {
+      vi.spyOn(service, "check").mockReturnValue(mockHealthResult);
+      const result = controller.check();
+      expect(result).toEqual(mockHealthResult);
+      expect(service.check).toHaveBeenCalledTimes(1);
+    });
+
+    it("should return status ok directly", () => {
+      const result = controller.check();
+      expect(result.status).toBe("ok");
+    });
+  });
+
+  describe("live()", () => {
+    it("should return liveness status", () => {
+      vi.spyOn(service, "live").mockReturnValue({ status: "ok" });
+      const result = controller.live();
+      expect(result).toEqual({ status: "ok" });
+    });
+  });
+
+  describe("ready()", () => {
+    it("should return readiness status with timestamp", () => {
+      const result = controller.ready();
+      expect(result.status).toBe("ok");
+      expect(result.timestamp).toBeDefined();
+    });
+  });
+});
+`
+
+// ─── Health Tests (Jest) ───
+
+var TmplHealthServiceJestSpec = `import { Test, TestingModule } from "@nestjs/testing";
+import { HealthService } from "./health.service";
+import { mockPinoLoggerProvider } from "../../../../test/mock/pino-mock";
+
+describe("HealthService", () => {
+  let service: HealthService;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [HealthService, mockPinoLoggerProvider],
+    }).compile();
+
+    service = module.get<HealthService>(HealthService);
+  });
+
+  describe("check()", () => {
+    it("should return status ok", () => {
+      const result = service.check();
+      expect(result.status).toBe("ok");
+    });
+
+    it("should include uptime as a number", () => {
+      const result = service.check();
+      expect(typeof result.uptime).toBe("number");
+      expect(result.uptime).toBeGreaterThanOrEqual(0);
+    });
+
+    it("should include a valid ISO timestamp", () => {
+      const result = service.check();
+      expect(result.timestamp).toBeDefined();
+      expect(() => new Date(result.timestamp)).not.toThrow();
+      expect(new Date(result.timestamp).toISOString()).toBe(result.timestamp);
+    });
+
+    it("should include memory usage", () => {
+      const result = service.check();
+      expect(result.memory).toBeDefined();
+      expect(typeof result.memory.heapUsed).toBe("number");
+    });
+  });
+
+  describe("live()", () => {
+    it("should return status ok", () => {
+      expect(service.live()).toEqual({ status: "ok" });
+    });
+  });
+
+  describe("ready()", () => {
+    it("should return status ok with timestamp", () => {
+      const result = service.ready();
+      expect(result.status).toBe("ok");
+      expect(result.timestamp).toBeDefined();
+    });
+  });
+});
+`
+
+var TmplHealthControllerJestSpec = `import { Test, TestingModule } from "@nestjs/testing";
+import { HealthController } from "./health.controller";
+import { HealthService } from "./health.service";
+import { mockPinoLoggerProvider } from "../../../../test/mock/pino-mock";
+
+const mockHealthResult = {
+  status: "ok",
+  uptime: 100,
+  timestamp: new Date().toISOString(),
+  memory: { heapUsed: 1024, heapTotal: 2048, rss: 4096, external: 0, arrayBuffers: 0 },
+  version: "0.1.0",
+};
+
+describe("HealthController", () => {
+  let controller: HealthController;
+  let service: HealthService;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [HealthController],
+      providers: [HealthService, mockPinoLoggerProvider],
+    }).compile();
+
+    controller = module.get<HealthController>(HealthController);
+    service = module.get<HealthService>(HealthService);
+  });
+
+  describe("check()", () => {
+    it("should return health check result", () => {
+      jest.spyOn(service, "check").mockReturnValue(mockHealthResult);
+      const result = controller.check();
+      expect(result).toEqual(mockHealthResult);
+      expect(service.check).toHaveBeenCalledTimes(1);
+    });
+
+    it("should return status ok directly", () => {
+      const result = controller.check();
+      expect(result.status).toBe("ok");
+    });
+  });
+
+  describe("live()", () => {
+    it("should return liveness status", () => {
+      jest.spyOn(service, "live").mockReturnValue({ status: "ok" });
+      const result = controller.live();
+      expect(result).toEqual({ status: "ok" });
+    });
+  });
+
+  describe("ready()", () => {
+    it("should return readiness status with timestamp", () => {
+      const result = controller.ready();
+      expect(result.status).toBe("ok");
+      expect(result.timestamp).toBeDefined();
+    });
+  });
+});
+`
+
 // ─── Auth Module ───
 
 var TmplAuthModule = `import { Module } from "@nestjs/common";

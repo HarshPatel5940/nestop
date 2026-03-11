@@ -106,8 +106,8 @@ huh.NewGroup(
 huh.NewSelect[string]().
 Title("Test framework").
 Options(
-huh.NewOption("Vitest (Recommended)", string(TestVitest)),
-huh.NewOption("Jest", string(TestJest)),
+huh.NewOption("Jest (Recommended)", string(TestJest)),
+huh.NewOption("Vitest", string(TestVitest)),
 ).
 Value(&testChoice),
 ),

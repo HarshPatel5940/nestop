@@ -122,6 +122,13 @@ if c.InitHealth {
 add("src/api/routes/health/health.module.ts", TmplHealthModule)
 add("src/api/routes/health/health.controller.ts", TmplHealthController)
 add("src/api/routes/health/health.service.ts", TmplHealthService)
+	if c.UsesVitest() {
+		add("src/api/routes/health/health.controller.spec.ts", TmplHealthControllerVitestSpec)
+		add("src/api/routes/health/health.service.spec.ts", TmplHealthServiceVitestSpec)
+	} else {
+		add("src/api/routes/health/health.controller.spec.ts", TmplHealthControllerJestSpec)
+		add("src/api/routes/health/health.service.spec.ts", TmplHealthServiceJestSpec)
+	}
 }
 
 // ── Routes: auth ──
