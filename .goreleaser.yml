@@ -1,0 +1,91 @@
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: nestop
+    binary: nestop
+    main: ./main.go
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X main.Version={{.Version}}
+      - -X main.BuildTime={{.Date}}
+
+archives:
+  - id: nestop
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - README.md
+
+checksum:
+  name_template: "checksums.txt"
+
+brews:
+  - name: nestop
+    repository:
+      owner: harshpatel5940
+      name: homebrew-tap
+    homepage: "https://github.com/harshpatel5940/nestop"
+    description: "Interactive CLI to scaffold NestJS projects with best practices"
+    license: "MIT"
+    install: |
+      bin.install "nestop"
+      doc.install "README.md" if File.exist?("README.md")
+    test: |
+      assert_match "nestop", shell_output("#{bin}/nestop --help 2>&1; true")
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - Merge pull request
+      - Merge branch
+
+release:
+  github:
+    owner: harshpatel5940
+    name: nestop
+  draft: false
+  prerelease: auto
+  name_template: "{{.ProjectName}} v{{.Version}}"
+  header: |
+    ## 🪺 nestop v{{.Version}}
+
+    **Scaffold NestJS projects interactively from the terminal.**
+
+    ### 🚀 Installation
+
+    **Homebrew:**
+    ```bash
+    brew install harshpatel5940/tap/nestop
+    ```
+
+    **Go:**
+    ```bash
+    go install github.com/harshpatel5940/nestop@{{.Tag}}
+    ```
+
+    **Binary:** Download below for your platform.
+
+    ### ⚡ Usage
+
+    ```bash
+    nestop
+    ```
+
+  footer: |
+    ---
+    **Full Changelog**: https://github.com/harshpatel5940/nestop/compare/{{.PreviousTag}}...{{.Tag}}

@@ -8,7 +8,30 @@ import (
 "github.com/harshpatel5940/nestop/internal"
 )
 
+// Version is set at build time via ldflags
+var (
+	Version   = "dev"
+	BuildTime = "unknown"
+)
+
 func main() {
+if len(os.Args) > 1 {
+	switch os.Args[1] {
+	case "--version", "-v":
+		fmt.Printf("nestop %s (built %s)\n", Version, BuildTime)
+		return
+	case "--help", "-h":
+		fmt.Println("nestop — Interactive NestJS project scaffolder")
+		fmt.Println()
+		fmt.Println("Usage: nestop [flags]")
+		fmt.Println()
+		fmt.Println("Flags:")
+		fmt.Println("  --version, -v   Print version")
+		fmt.Println("  --help,    -h   Show this help")
+		return
+	}
+}
+
 fmt.Println("🪺 nestop — NestJS Starter Scaffolder")
 fmt.Println()
 
