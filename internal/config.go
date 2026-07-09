@@ -8,58 +8,58 @@ type DatabaseORM string
 type TestFramework string
 
 const (
-PMPnpm PackageManager = "pnpm"
-PMBun  PackageManager = "bun"
+	PMPnpm PackageManager = "pnpm"
+	PMBun  PackageManager = "bun"
 
-AdapterFastify Adapter = "fastify"
-AdapterExpress Adapter = "express"
+	AdapterFastify Adapter = "fastify"
+	AdapterExpress Adapter = "express"
 
-S3Garage S3Provider = "garage"
-S3AWS    S3Provider = "aws"
-S3None   S3Provider = "none"
+	S3Garage S3Provider = "garage"
+	S3AWS    S3Provider = "aws"
+	S3None   S3Provider = "none"
 
-DBPostgres DatabaseChoice = "postgres"
-DBMySQL    DatabaseChoice = "mysql"
-DBSQLite   DatabaseChoice = "sqlite"
-DBMongoDB  DatabaseChoice = "mongodb"
-DBNone     DatabaseChoice = "none"
+	DBPostgres DatabaseChoice = "postgres"
+	DBMySQL    DatabaseChoice = "mysql"
+	DBSQLite   DatabaseChoice = "sqlite"
+	DBMongoDB  DatabaseChoice = "mongodb"
+	DBNone     DatabaseChoice = "none"
 
-ORMPrisma   DatabaseORM = "prisma"
-ORMDrizzle  DatabaseORM = "drizzle"
-ORMMongoose DatabaseORM = "mongoose"
+	ORMPrisma   DatabaseORM = "prisma"
+	ORMDrizzle  DatabaseORM = "drizzle"
+	ORMMongoose DatabaseORM = "mongoose"
 
-TestVitest TestFramework = "vitest"
-TestJest   TestFramework = "jest"
+	TestVitest TestFramework = "vitest"
+	TestJest   TestFramework = "jest"
 )
 
 type ProjectConfig struct {
-// Core
-ProjectName    string
-PackageManager PackageManager
-Adapter        Adapter
+	// Core
+	ProjectName    string
+	PackageManager PackageManager
+	Adapter        Adapter
 
-// Providers
-EnableRedis bool
-S3Provider  S3Provider
+	// Providers
+	EnableRedis bool
+	S3Provider  S3Provider
 
-// Database
-Database DatabaseChoice
-ORM      DatabaseORM
+	// Database
+	Database DatabaseChoice
+	ORM      DatabaseORM
 
-// Tests + endpoints
-TestFramework TestFramework
-InitHealth    bool
-InitAuth      bool
+	// Tests + endpoints
+	TestFramework TestFramework
+	InitHealth    bool
+	InitAuth      bool
 
-// Tooling (all optional, asked in form)
-IncludeMakefile bool
-IncludeCI       bool
-IncludeVSCode   bool
-IncludeHusky    bool
+	// Tooling (all optional, asked in form)
+	IncludeMakefile bool
+	IncludeCI       bool
+	IncludeVSCode   bool
+	IncludeHusky    bool
 
-// Post-scaffold actions
-InstallDeps bool
-InitGit     bool
+	// Post-scaffold actions
+	InstallDeps bool
+	InitGit     bool
 }
 
 func (t PackageManager) String() string { return string(t) }
@@ -89,21 +89,21 @@ func (c *ProjectConfig) NeedsMongoDocker() bool    { return c.Database == DBMong
 func (c *ProjectConfig) IsSQLite() bool            { return c.Database == DBSQLite }
 
 func (c *ProjectConfig) IsPostgresDrizzle() bool {
-return c.Database == DBPostgres && c.ORM == ORMDrizzle
+	return c.Database == DBPostgres && c.ORM == ORMDrizzle
 }
 func (c *ProjectConfig) IsMySQLDrizzle() bool {
-return c.Database == DBMySQL && c.ORM == ORMDrizzle
+	return c.Database == DBMySQL && c.ORM == ORMDrizzle
 }
 func (c *ProjectConfig) IsSQLiteDrizzle() bool {
-return c.Database == DBSQLite && c.ORM == ORMDrizzle
+	return c.Database == DBSQLite && c.ORM == ORMDrizzle
 }
 func (c *ProjectConfig) DrizzleDialect() string {
-switch c.Database {
-case DBMySQL:
-return "mysql"
-case DBSQLite:
-return "sqlite"
-default:
-return "postgresql"
-}
+	switch c.Database {
+	case DBMySQL:
+		return "mysql"
+	case DBSQLite:
+		return "sqlite"
+	default:
+		return "postgresql"
+	}
 }
