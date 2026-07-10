@@ -25,10 +25,10 @@ builds:
 archives:
   - id: nestop
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-    formats: [tar.gz]
+    format: tar.gz
     format_overrides:
       - goos: windows
-        formats: [zip]
+        format: zip
     files:
       - README.md
 
